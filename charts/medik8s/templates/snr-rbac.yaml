@@ -1,0 +1,218 @@
+{{- if .Values.snr.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: self-node-remediation-manager
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - secrets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - delete
+      - deletecollection
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - create
+      - delete
+      - update
+  - apiGroups:
+      - self-node-remediation.medik8s.io
+    resources:
+      - selfnoderemediationconfigs
+      - selfnoderemediations
+      - selfnoderemediationtemplates
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - self-node-remediation.medik8s.io
+    resources:
+      - selfnoderemediationconfigs/finalizers
+      - selfnoderemediations/finalizers
+      - selfnoderemediationtemplates/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - self-node-remediation.medik8s.io
+    resources:
+      - selfnoderemediationconfigs/status
+      - selfnoderemediations/status
+      - selfnoderemediationtemplates/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments
+    verbs:
+      - delete
+      - deletecollection
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: self-node-remediation-manager
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: self-node-remediation-manager
+subjects:
+  - kind: ServiceAccount
+    name: self-node-remediation-controller-manager
+    namespace: {{ .Values.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: self-node-remediation-ext-remediation
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    rbac.ext-remediation/aggregate-to-ext-remediation: "true"
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - self-node-remediation.medik8s.io
+    resources:
+      - selfnoderemediationtemplates
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - self-node-remediation.medik8s.io
+    resources:
+      - selfnoderemediations
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: self-node-remediation-leader-election
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+      - coordination.k8s.io
+    resources:
+      - configmaps
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: self-node-remediation-leader-election
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: self-node-remediation-leader-election
+subjects:
+  - kind: ServiceAccount
+    name: self-node-remediation-controller-manager
+    namespace: {{ .Values.namespace }}
+{{- end }}
