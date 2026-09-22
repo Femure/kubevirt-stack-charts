@@ -18,6 +18,7 @@ operator:
       memory: 450Mi
   nodeSelector: {}
   tolerations: []
+  priorityClassName: kubevirt-cluster-critical
 
 ## virt-exportproxy is always deployed by KubeVirt (VMExport feature gate).
 ## externalMode creates an Ingress + TLS cert so VMExport external links
@@ -68,6 +69,22 @@ cr:
   imagePullPolicy: IfNotPresent
   monitorNamespace: ""
   monitorAccount: ""
-  customizeComponents: {}
+  ## PriorityClass for the components virt-operator itself deploys (virt-api, virt-controller,
+  ## virt-handler). VM pods (virt-launcher) are NOT covered here: KubeVirt has no CR field for
+  ## that, it is set per-VM via spec.template.spec.priorityClassName on the VirtualMachine.
+  customizeComponents:
+    patches:
+      - resourceType: Deployment
+        resourceName: virt-api
+        patch: '{"spec":{"template":{"spec":{"priorityClassName":"kubevirt-cluster-critical"}}}}'
+        type: strategic
+      - resourceType: Deployment
+        resourceName: virt-controller
+        patch: '{"spec":{"template":{"spec":{"priorityClassName":"kubevirt-cluster-critical"}}}}'
+        type: strategic
+      - resourceType: DaemonSet
+        resourceName: virt-handler
+        patch: '{"spec":{"template":{"spec":{"priorityClassName":"kubevirt-cluster-critical"}}}}'
+        type: strategic
   workloadUpdateStrategy: {}
   certificateRotateStrategy: {}

@@ -14,6 +14,7 @@ operator:
   resources: {}
   nodeSelector: {}
   tolerations: []
+  priorityClassName: kubevirt-cluster-critical
 
 ## Trusted CA bundle for Forklift Provider connections.
 ## If your source clusters use certificates signed by a corporate CA,

@@ -18,6 +18,7 @@ resources:
 
 nodeSelector: {}
 tolerations: []
+priorityClassName: kubevirt-cluster-critical
 
 certManager:
   reloader: true

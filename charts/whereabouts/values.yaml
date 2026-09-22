@@ -23,6 +23,7 @@ tolerations:
     effect: NoSchedule
 
 nodeSelector: {}
+priorityClassName: kubevirt-cluster-critical
 
 cniConf:
   confDir: /etc/cni/net.d
@@ -33,6 +34,7 @@ cronExpression: "30 4 * * *"
 reconciler:
   enabled: true
   logLevel: debug
+  priorityClassName: kubevirt-cluster-critical
   resources:
     requests:
       cpu: 100m
@@ -43,6 +45,7 @@ reconciler:
 
 nodeSliceController:
   enabled: true
+  priorityClassName: kubevirt-cluster-critical
   resources:
     requests:
       cpu: 100m
