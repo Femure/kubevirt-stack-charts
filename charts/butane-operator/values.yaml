@@ -26,4 +26,4 @@ resources:
 
 nodeSelector: {}
 tolerations: []
-priorityClassName: kubevirt-cluster-critical
+priorityClassName: ""

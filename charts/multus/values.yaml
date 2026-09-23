@@ -30,7 +30,7 @@ resources:
 tolerations:
   - operator: Exists
 
-priorityClassName: kubevirt-cluster-critical
+priorityClassName: system-node-critical
 
 dynamicNetworks:
   enabled: true
@@ -43,4 +43,4 @@ dynamicNetworks:
     requests:
       cpu: 100m
       memory: 50Mi
-  priorityClassName: kubevirt-cluster-critical
+  priorityClassName: system-node-critical

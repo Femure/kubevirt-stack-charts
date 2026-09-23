@@ -15,4 +15,4 @@ replicas: 1
 resources: {}
 nodeSelector: {}
 tolerations: []
-priorityClassName: kubevirt-cluster-critical
+priorityClassName: ""

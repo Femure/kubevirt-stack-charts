@@ -14,12 +14,12 @@ operator:
   resources: {}
   nodeSelector: {}
   tolerations: []
-  priorityClassName: kubevirt-cluster-critical
+  priorityClassName: ""
 
 cr:
   imagePullPolicy: IfNotPresent
   ## PriorityClass applied to the whole AAQ control plane (aaq-server, aaq-controller).
-  priorityClass: kubevirt-cluster-critical
+  priorityClass: ""
   infra:
     nodeSelector:
       kubernetes.io/os: linux

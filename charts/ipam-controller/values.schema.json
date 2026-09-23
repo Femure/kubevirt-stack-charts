@@ -175,7 +175,7 @@
       "title": "Priority Class Name",
       "description": "PriorityClass for the kubevirt-ipam-controller-manager pod.",
       "type": "string",
-      "default": "kubevirt-cluster-critical"
+      "default": "system-cluster-critical"
     },
     "certManager": {
       "title": "Certificate manager",

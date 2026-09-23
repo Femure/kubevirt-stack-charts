@@ -16,7 +16,7 @@ replicas: 1
 resources: {}
 nodeSelector: {}
 tolerations: []
-priorityClassName: kubevirt-cluster-critical
+priorityClassName: system-cluster-critical
 
 certManager:
   caRotateInterval: "8760h0m0s"

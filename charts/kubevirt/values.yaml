@@ -86,5 +86,9 @@ cr:
         resourceName: virt-handler
         patch: '{"spec":{"template":{"spec":{"priorityClassName":"kubevirt-cluster-critical"}}}}'
         type: strategic
+      - resourceType: Deployment
+        resourceName: virt-exportproxy
+        patch: '{"spec":{"template":{"spec":{"priorityClassName":"kubevirt-cluster-critical"}}}}'
+        type: strategic
   workloadUpdateStrategy: {}
   certificateRotateStrategy: {}

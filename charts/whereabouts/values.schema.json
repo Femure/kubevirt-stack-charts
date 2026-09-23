@@ -57,7 +57,8 @@
     },
     "priorityClassName": {
       "type": "string",
-      "description": "PriorityClass for the whereabouts DaemonSet pods"
+      "description": "PriorityClass for the whereabouts DaemonSet pods",
+      "default": "system-node-critical"
     },
     "nodeSelector": {
       "type": "object",
@@ -99,7 +100,8 @@
         },
         "priorityClassName": {
           "type": "string",
-          "description": "PriorityClass for the reconciler pod"
+          "description": "PriorityClass for the reconciler pod",
+          "default": "system-cluster-critical"
         }
       },
       "additionalProperties": false
@@ -117,7 +119,8 @@
         },
         "priorityClassName": {
           "type": "string",
-          "description": "PriorityClass for the node-slice controller pod"
+          "description": "PriorityClass for the node-slice controller pod",
+          "default": "system-cluster-critical"
         }
       },
       "additionalProperties": false

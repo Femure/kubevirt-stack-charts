@@ -291,6 +291,11 @@
             }
           }
         },
+        "priorityClassName": {
+          "title": "Priority Class Name",
+          "description": "PriorityClass for the forklift-inventory-proxy pod.",
+          "type": "string"
+        },
         "rbacProxy": {
           "title": "RBAC Proxy",
           "description": "kube-rbac-proxy sidecar that validates user identity and checks RBAC on providers.forklift.konveyor.io before allowing access.",

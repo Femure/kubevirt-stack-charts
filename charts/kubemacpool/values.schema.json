@@ -187,7 +187,7 @@
       "title": "Priority Class Name",
       "description": "PriorityClass for the KubeMacPool controller and cert-manager pods.",
       "type": "string",
-      "default": "kubevirt-cluster-critical"
+      "default": "system-cluster-critical"
     },
     "certManager": {
       "title": "Built-in certificate manager",

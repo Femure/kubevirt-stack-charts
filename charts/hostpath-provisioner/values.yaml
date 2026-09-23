@@ -17,7 +17,7 @@ operator:
     repository: quay.io/kubevirt/hostpath-provisioner-operator
   nodeSelector: {}
   tolerations: []
-  priorityClassName: kubevirt-cluster-critical
+  priorityClassName: ""
 
 certManager:
   reloader: true
