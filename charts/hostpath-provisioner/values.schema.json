@@ -85,20 +85,6 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "image": {
-          "title": "Image",
-          "description": "Container image settings for the hostpath-provisioner operator.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "repository": {
-              "title": "Repository",
-              "description": "Container image repository for the hostpath-provisioner operator.",
-              "type": "string",
-              "default": "quay.io/kubevirt/hostpath-provisioner-operator"
-            }
-          }
-        },
         "nodeSelector": {
           "title": "Node Selector",
           "description": "Node selector for scheduling the hostpath-provisioner operator pods.",
@@ -121,6 +107,18 @@
           "title": "Priority Class Name",
           "description": "PriorityClass for the hostpath-provisioner-operator pod.",
           "type": "string"
+        },
+        "images": {
+          "title": "Sidecar Images",
+          "description": "Image overrides for sidecar images injected by the operator as env vars.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "nodeDriverRegistrar":  { "type": "object", "additionalProperties": true },
+            "livenessProbe":        { "type": "object", "additionalProperties": true },
+            "csiSnapshotter":       { "type": "object", "additionalProperties": true },
+            "csiProvisioner":       { "type": "object", "additionalProperties": true }
+          }
         }
       }
     },
@@ -158,6 +156,28 @@
               "default": "cert-manager.io"
             }
           }
+        }
+      }
+    },
+    "storageClass": {
+      "title": "StorageClass Configuration",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "isDefault": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "webhook": {
+      "title": "Webhook Configuration",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "failurePolicy": {
+          "type": "string",
+          "default": "Ignore"
         }
       }
     },
