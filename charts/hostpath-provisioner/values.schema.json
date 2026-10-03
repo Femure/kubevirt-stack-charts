@@ -127,11 +127,14 @@
           }
         },
         "images": {
-          "title": "Sidecar Images",
-          "description": "Image overrides for sidecar images injected by the operator as env vars.",
+          "title": "Images",
+          "description": "Container image overrides for the operator and sidecar images.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
+            "operator":           { "type": "object", "additionalProperties": true },
+            "provisioner":        { "type": "object", "additionalProperties": true },
+            "csiDriver":          { "type": "object", "additionalProperties": true },
             "nodeDriverRegistrar":  { "type": "object", "additionalProperties": true },
             "livenessProbe":        { "type": "object", "additionalProperties": true },
             "csiSnapshotter":       { "type": "object", "additionalProperties": true },

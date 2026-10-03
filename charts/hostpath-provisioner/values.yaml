@@ -22,6 +22,15 @@ operator:
       memory: 150Mi
     limits: {}
   images:
+    operator:
+      repository: quay.io/kubevirt/hostpath-provisioner-operator
+      tag: ""
+    provisioner:
+      repository: quay.io/kubevirt/hostpath-provisioner
+      tag: ""
+    csiDriver:
+      repository: quay.io/kubevirt/hostpath-csi-driver
+      tag: ""
     nodeDriverRegistrar:
       repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
       tag: v2.2.0
