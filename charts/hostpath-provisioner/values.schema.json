@@ -108,6 +108,24 @@
           "description": "PriorityClass for the hostpath-provisioner-operator pod.",
           "type": "string"
         },
+        "resources": {
+          "title": "Resources",
+          "description": "CPU/Memory resource requests and limits for the operator container.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "default": { "cpu": "10m", "memory": "150Mi" }
+            },
+            "limits": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "default": {}
+            }
+          }
+        },
         "images": {
           "title": "Sidecar Images",
           "description": "Image overrides for sidecar images injected by the operator as env vars.",
