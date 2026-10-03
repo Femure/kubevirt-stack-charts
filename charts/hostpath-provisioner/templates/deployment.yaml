@@ -92,9 +92,7 @@ spec:
             periodSeconds: 5
             failureThreshold: 1
           resources:
-            requests:
-              cpu: 10m
-              memory: 150Mi
+            {{- toYaml .Values.operator.resources | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

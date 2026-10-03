@@ -16,6 +16,11 @@ operator:
   nodeSelector: {}
   tolerations: []
   priorityClassName: ""
+  resources:
+    requests:
+      cpu: 10m
+      memory: 150Mi
+    limits: {}
   images:
     nodeDriverRegistrar:
       repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
