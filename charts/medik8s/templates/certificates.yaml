@@ -1,0 +1,65 @@
+{{- if .Values.certManager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: medik8s-selfsigned-issuer
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+{{- if .Values.nhc.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nhc-serving-cert
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  secretName: nhc-webhook-server-cert
+  dnsNames:
+    - node-healthcheck-webhook-service.{{ .Values.namespace }}.svc
+    - node-healthcheck-webhook-service.{{ .Values.namespace }}.svc.cluster.local
+  issuerRef:
+    name: medik8s-selfsigned-issuer
+    kind: Issuer
+{{- end }}
+---
+{{- if .Values.far.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: far-serving-cert
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  secretName: far-webhook-server-cert
+  dnsNames:
+    - fence-agents-remediation-webhook-service.{{ .Values.namespace }}.svc
+    - fence-agents-remediation-webhook-service.{{ .Values.namespace }}.svc.cluster.local
+  issuerRef:
+    name: medik8s-selfsigned-issuer
+    kind: Issuer
+{{- end }}
+---
+{{- if .Values.snr.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: snr-serving-cert
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  secretName: snr-webhook-server-cert
+  dnsNames:
+    - self-node-remediation-webhook-service.{{ .Values.namespace }}.svc
+    - self-node-remediation-webhook-service.{{ .Values.namespace }}.svc.cluster.local
+  issuerRef:
+    name: medik8s-selfsigned-issuer
+    kind: Issuer
+{{- end }}
+{{- end }}
