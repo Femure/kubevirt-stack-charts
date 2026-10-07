@@ -1,0 +1,48 @@
+{{- if .Values.snr.enabled }}
+apiVersion: self-node-remediation.medik8s.io/v1alpha1
+kind: SelfNodeRemediationConfig
+metadata:
+  name: self-node-remediation-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  safeTimeToAssumeNodeRebootedSeconds: {{ .Values.snr.config.safeTimeToAssumeNodeRebootedSeconds }}
+  isSoftwareRebootEnabled: {{ .Values.snr.config.isSoftwareRebootEnabled }}
+  watchdogFilePath: {{ .Values.snr.config.watchdogFilePath | quote }}
+  hostPort: {{ .Values.snr.config.hostPort }}
+  apiCheckInterval: {{ .Values.snr.config.apiCheckInterval | quote }}
+  apiServerTimeout: {{ .Values.snr.config.apiServerTimeout | quote }}
+  peerApiServerTimeout: {{ .Values.snr.config.peerApiServerTimeout | quote }}
+  peerDialTimeout: {{ .Values.snr.config.peerDialTimeout | quote }}
+  peerRequestTimeout: {{ .Values.snr.config.peerRequestTimeout | quote }}
+  peerUpdateInterval: {{ .Values.snr.config.peerUpdateInterval | quote }}
+  maxApiErrorThreshold: {{ .Values.snr.config.maxApiErrorThreshold }}
+---
+apiVersion: self-node-remediation.medik8s.io/v1alpha1
+kind: SelfNodeRemediationTemplate
+metadata:
+  name: self-node-remediation-automatic-strategy-template
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      remediationStrategy: Automatic
+---
+apiVersion: self-node-remediation.medik8s.io/v1alpha1
+kind: SelfNodeRemediationTemplate
+metadata:
+  name: self-node-remediation-resource-deletion-strategy-template
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: self-node-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      remediationStrategy: ResourceDeletion
+{{- end }}

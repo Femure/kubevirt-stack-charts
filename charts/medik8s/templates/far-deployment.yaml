@@ -1,0 +1,116 @@
+{{- if .Values.far.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fence-agents-remediation-controller-manager
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    control-plane: controller-manager
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.far.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fence-agents-remediation-operator
+      control-plane: controller-manager
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+        {{- if .Values.far.additionalNetworks }}
+        k8s.v1.cni.cncf.io/networks: {{ include "medik8s.multusNetworks" .Values.far.additionalNetworks | quote }}
+        {{- end }}
+      labels:
+        app.kubernetes.io/name: fence-agents-remediation-operator
+        control-plane: controller-manager
+    spec:
+      serviceAccountName: fence-agents-remediation-controller-manager
+      priorityClassName: system-cluster-critical
+      terminationGracePeriodSeconds: 15
+      {{- include "kubevirt-stack.imagePullSecrets" . | nindent 6 }}
+      containers:
+        - name: manager
+          image: {{ include "kubevirt-stack.image" (dict "repository" .Values.far.image.repository "tag" .Values.far.image.tag "global" .Values.global) }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /manager
+          args:
+            - --health-probe-bind-address=:8081
+            - --metrics-bind-address=:8443
+            - --leader-elect
+            - --enable-http2=false
+          env:
+            - name: DEPLOYMENT_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - containerPort: 9443
+              name: webhook-server
+              protocol: TCP
+            - containerPort: 8443
+              name: https
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 20
+          {{- with .Values.far.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - name: cert
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        {{- include "kubevirt-stack.nodeSelector" (dict "global" .Values.global.nodeSelector "local" .Values.far.nodeSelector) | nindent 8 }}
+      {{- $tolerations := include "kubevirt-stack.tolerations" (dict "global" .Values.global.tolerations "local" .Values.far.tolerations) -}}
+      {{- if $tolerations }}
+      tolerations:
+        {{- $tolerations | nindent 8 }}
+      {{- end }}
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: fence-agents-remediation-operator
+              control-plane: controller-manager
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: far-webhook-server-cert
+{{- end }}
