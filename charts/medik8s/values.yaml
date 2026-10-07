@@ -1,0 +1,68 @@
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  nodeSelector: {}
+  tolerations: []
+
+namespace: medik8s-system
+
+nhc:
+  enabled: true
+  replicas: 2
+  image:
+    repository: quay.io/medik8s/node-healthcheck-operator
+    tag: v0.12.0
+  resources:
+    requests:
+      cpu: 100m
+      memory: 20Mi
+  nodeSelector: {}
+  tolerations: []
+
+far:
+  enabled: true
+  replicas: 2
+  image:
+    repository: quay.io/medik8s/fence-agents-remediation-operator
+    tag: v0.8.0
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+  nodeSelector: {}
+  tolerations: []
+  additionalNetworks: []
+  # additionalNetworks:
+  #   - name: bmc-net
+  #     namespace: default
+
+snr:
+  enabled: true
+  replicas: 2
+  image:
+    repository: quay.io/medik8s/self-node-remediation-operator
+    tag: v0.13.0
+  resources:
+    requests:
+      cpu: 20m
+      memory: 110Mi
+  nodeSelector: {}
+  tolerations: []
+  config:
+    safeTimeToAssumeNodeRebootedSeconds: 180
+    isSoftwareRebootEnabled: true
+    watchdogFilePath: /dev/watchdog
+    hostPort: 30001
+    apiCheckInterval: "15s"
+    apiServerTimeout: "5s"
+    peerApiServerTimeout: "5s"
+    peerDialTimeout: "5s"
+    peerRequestTimeout: "7s"
+    peerUpdateInterval: "15m"
+    maxApiErrorThreshold: 3
+
+certManager:
+  enabled: true

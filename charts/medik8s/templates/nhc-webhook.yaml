@@ -1,0 +1,72 @@
+{{- if .Values.nhc.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-healthcheck-webhook-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: node-healthcheck-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+  selector:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: node-healthcheck-operator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-healthcheck-controller-manager-metrics-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: node-healthcheck-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - name: https
+      port: 8443
+      targetPort: https
+  selector:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: node-healthcheck-operator
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: node-healthcheck-validating-webhook-configuration
+  labels:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: node-healthcheck-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  {{- if .Values.certManager.enabled }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/nhc-serving-cert
+  {{- end }}
+webhooks:
+  - name: vnodehealthcheck.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: node-healthcheck-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /validate-remediation-medik8s-io-v1alpha1-nodehealthcheck
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - remediation.medik8s.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - nodehealthchecks
+    sideEffects: None
+{{- end }}

@@ -1,0 +1,142 @@
+{{- if .Values.far.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: fence-agents-remediation-webhook-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+  selector:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    control-plane: controller-manager
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fence-agents-remediation-controller-manager-metrics-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    control-plane: controller-manager
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+spec:
+  ports:
+    - name: https
+      port: 8443
+      targetPort: https
+  selector:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    control-plane: controller-manager
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: fence-agents-remediation-mutating-webhook-configuration
+  labels:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  {{- if .Values.certManager.enabled }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/far-serving-cert
+  {{- end }}
+webhooks:
+  - name: mfenceagentsremediation.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: fence-agents-remediation-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /mutate-fence-agents-remediation-medik8s-io-v1alpha1-fenceagentsremediation
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - fence-agents-remediation.medik8s.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - fenceagentsremediations
+    sideEffects: None
+  - name: mfenceagentsremediationtemplate.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: fence-agents-remediation-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /mutate-fence-agents-remediation-medik8s-io-v1alpha1-fenceagentsremediationtemplate
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - fence-agents-remediation.medik8s.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - fenceagentsremediationtemplates
+    sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: fence-agents-remediation-validating-webhook-configuration
+  labels:
+    app.kubernetes.io/name: fence-agents-remediation-operator
+    {{- include "kubevirt-stack.labels" . | nindent 4 }}
+  {{- if .Values.certManager.enabled }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/far-serving-cert
+  {{- end }}
+webhooks:
+  - name: vfenceagentsremediation.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: fence-agents-remediation-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /validate-fence-agents-remediation-medik8s-io-v1alpha1-fenceagentsremediation
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - fence-agents-remediation.medik8s.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - fenceagentsremediations
+    sideEffects: None
+  - name: vfenceagentsremediationtemplate.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: fence-agents-remediation-webhook-service
+        namespace: {{ .Values.namespace }}
+        path: /validate-fence-agents-remediation-medik8s-io-v1alpha1-fenceagentsremediationtemplate
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - fence-agents-remediation.medik8s.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - fenceagentsremediationtemplates
+    sideEffects: None
+{{- end }}
