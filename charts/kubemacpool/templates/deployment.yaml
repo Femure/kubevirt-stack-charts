@@ -21,7 +21,9 @@ spec:
         control-plane: mac-controller-manager
     spec:
       serviceAccountName: kubemacpool
-      priorityClassName: system-cluster-critical
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       terminationGracePeriodSeconds: 5
       containers:
         - name: manager
