@@ -47,6 +47,8 @@ spec:
               value: {{ .Values.rangeEnd | quote }}
             - name: KUBEVIRT_CLIENT_GO_SCHEME_REGISTRATION_VERSION
               value: v1
+            - name: TLS_MIN_VERSION
+              value: VersionTLS13
           ports:
             - containerPort: 8000
               name: webhook-server
